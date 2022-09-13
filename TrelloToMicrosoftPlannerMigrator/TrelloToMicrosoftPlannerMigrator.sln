@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrelloToMicrosoftPlannerMigrator", "TrelloToMicrosoftPlannerMigrator.csproj", "{EF7D34EC-6274-4ED8-94DC-53F97DC14069}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF7D34EC-6274-4ED8-94DC-53F97DC14069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF7D34EC-6274-4ED8-94DC-53F97DC14069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF7D34EC-6274-4ED8-94DC-53F97DC14069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF7D34EC-6274-4ED8-94DC-53F97DC14069}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D08C18E-FFDF-4BA9-9772-A1D22818BEE2}
+	EndGlobalSection
+EndGlobal
