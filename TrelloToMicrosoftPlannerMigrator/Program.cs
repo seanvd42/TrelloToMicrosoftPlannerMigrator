@@ -1,5 +1,13 @@
-var builder = WebApplication.CreateBuilder(args);
+using TrelloToMicrosoftPlannerMigrator.Services;
 
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IMigrationService, MigrationService>();
+builder.Services.AddScoped<IListMigrationService, ListMigrationService>();
+builder.Services.AddScoped<ICardMigrationService, CardMigrationService>();
+builder.Services.AddScoped<IActionMigrationService, ActionMigrationService>();
+builder.Services.AddScoped<IChecklistMigrationService, ChecklistMigrationService>();
+builder.Services.AddScoped<ILabelMigrationService, LabelMigrationService>();
+builder.Services.AddScoped<IPlaceholderMigrationService, PlaceholderMigrationService>();
 // Add services to the container.
 builder.Services.AddRazorPages();
 
