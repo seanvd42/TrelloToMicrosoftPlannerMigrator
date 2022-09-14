@@ -16,3 +16,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-checkbox {
+    text-align: left
+}

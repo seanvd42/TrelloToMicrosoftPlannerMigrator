@@ -5,6 +5,55 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Migrate Trello to Microsoft Planner</h1>
+    <p>Upload your Trello board json file and select what you would like to expert</p>
+    <form method="post" enctype="multipart/form-data">
+        <table>
+            <tbody>
+                <tr><td colspan="2" align="center"><input type="file" asp-for="Upload" /></td></tr>
+                <tr>
+                    <td class="form-checkbox">
+                        <input type="checkbox" asp-for="IncludeLists" checked="checked">
+                        <label asp-for="IncludeLists">Lists</label>
+                    </td>
+                    <td class="form-checkbox">
+                        <input type="checkbox" asp-for="IncludeCards" checked="checked">
+                        <label asp-for="IncludeCards">Cards</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-checkbox">
+                        <input type="checkbox" asp-for="IncludeActions">
+                        <label asp-for="IncludeActions">Actions</label>
+                    </td>
+                    <td class="form-checkbox">
+                        <input type="checkbox" asp-for="IncludeChecklists">
+                        <label asp-for="IncludeChecklists">Checklists</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-checkbox">
+                        <input type="checkbox" asp-for="IncludeLabels">
+                        <label asp-for="IncludeLabels">Labels</label>
+                    </td>
+                    <td class="form-checkbox">
+                        <input type="checkbox" asp-for="IncludePlaceholder">
+                        <label asp-for="IncludePlaceholder">Placeholder</label>
+                    </td>
+                </tr>
+                <tr><td></td></tr>
+                <tr><td colspan="2" align="center"><input type="submit" /></td></tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+<br />
+<br />
+<br />
+<div class="text-center" style="white-space:pre-line;">
+    <h2 class="display-4">Your board</h2>
+    <br />
+    <p>
+        @Model.TestDisplay
+    </p>
 </div>
