@@ -7,7 +7,6 @@ builder.Services.AddScoped<ICardMigrationService, CardMigrationService>();
 builder.Services.AddScoped<ICommentMigrationService, CommentMigrationService>();
 builder.Services.AddScoped<IChecklistMigrationService, ChecklistMigrationService>();
 builder.Services.AddScoped<ILabelMigrationService, LabelMigrationService>();
-builder.Services.AddScoped<IPlaceholderMigrationService, PlaceholderMigrationService>();
 // Add services to the container.
 builder.Services.AddRazorPages();
 

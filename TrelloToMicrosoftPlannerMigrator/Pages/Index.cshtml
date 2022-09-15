@@ -10,7 +10,6 @@
     <form method="post" enctype="multipart/form-data">
         <table>
             <tbody>
-                <tr><td colspan="2" align="center"><input type="file" asp-for="Upload" /></td></tr>
                 <tr>
                     <td class="form-checkbox">
                         <input type="checkbox" asp-for="IncludeArchivedLists" checked="checked">
@@ -21,26 +20,7 @@
                         <label asp-for="IncludeArchivedCards">Archived Cards</label>
                     </td>
                 </tr>
-                <tr>
-                    <td class="form-checkbox">
-                        <input type="checkbox" asp-for="IncludeActions">
-                        <label asp-for="IncludeActions">Actions</label>
-                    </td>
-                    <td class="form-checkbox">
-                        <input type="checkbox" asp-for="IncludeChecklists">
-                        <label asp-for="IncludeChecklists">Checklists</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="form-checkbox">
-                        <input type="checkbox" asp-for="IncludeLabels">
-                        <label asp-for="IncludeLabels">Labels</label>
-                    </td>
-                    <td class="form-checkbox">
-                        <input type="checkbox" asp-for="IncludePlaceholder">
-                        <label asp-for="IncludePlaceholder">Placeholder</label>
-                    </td>
-                </tr>
+                <tr><td colspan="2" align="center"><input type="file" asp-for="Upload" /></td></tr>
                 <tr><td></td></tr>
                 <tr><td colspan="2" align="center"><input type="submit" /></td></tr>
             </tbody>
