@@ -1,4 +1,6 @@
-﻿namespace TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels
+﻿using System.Net.Mail;
+
+namespace TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels
 {
     public class Card
     {
@@ -10,6 +12,7 @@
         public double? pos { get; set; }
         public bool? closed { get; set; }
         public string desc { get; set; }
+        public List<Attachment> attachments { get; set; }
     }
 
 

@@ -2,8 +2,8 @@
 {
     public class MigrationConfiguration
     {
-        public bool IncludeLists { get; set; }
-        public bool IncludeCards { get; set; }
+        public bool IncludeArchivedLists { get; set; }
+        public bool IncludeArchivedCards { get; set; }
         public bool IncludeActions { get; set; }
         public bool IncludeChecklists { get; set; }
         public bool IncludeLabels { get; set; }

@@ -1,15 +1,15 @@
-﻿using TrelloToMicrosoftPlannerMigrator.Models;
+﻿using Action = TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels.Action;
 
 namespace TrelloToMicrosoftPlannerMigrator.Services
 {
-    public interface IActionMigrationService
+    public interface ICommentMigrationService
     {
-        void MigrateActions(TrelloBoard board);
+         void MigrateComments(List<Action> comments);
     }
 
-    public class ActionMigrationService : IActionMigrationService
+    public class CommentMigrationService : ICommentMigrationService
     {
-        public void MigrateActions(TrelloBoard board)
+        public void MigrateComments(List<Action> comments)
         {
 
         }

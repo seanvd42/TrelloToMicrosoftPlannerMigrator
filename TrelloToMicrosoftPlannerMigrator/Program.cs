@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IMigrationService, MigrationService>();
 builder.Services.AddScoped<IListMigrationService, ListMigrationService>();
 builder.Services.AddScoped<ICardMigrationService, CardMigrationService>();
-builder.Services.AddScoped<IActionMigrationService, ActionMigrationService>();
+builder.Services.AddScoped<ICommentMigrationService, CommentMigrationService>();
 builder.Services.AddScoped<IChecklistMigrationService, ChecklistMigrationService>();
 builder.Services.AddScoped<ILabelMigrationService, LabelMigrationService>();
 builder.Services.AddScoped<IPlaceholderMigrationService, PlaceholderMigrationService>();

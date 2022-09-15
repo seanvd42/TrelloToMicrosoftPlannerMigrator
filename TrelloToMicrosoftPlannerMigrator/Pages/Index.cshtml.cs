@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Reflection.PortableExecutable;
 using TrelloToMicrosoftPlannerMigrator.Models;
 using TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels;
@@ -16,10 +18,10 @@ namespace TrelloToMicrosoftPlannerMigrator.Pages
         public IFormFile? Upload { get; set; }
 
         [BindProperty]
-        public bool IncludeLists { get; set; }
+        public bool IncludeArchivedLists { get; set; }
 
         [BindProperty]
-        public bool IncludeCards { get; set; }
+        public bool IncludeArchivedCards { get; set; }
 
         [BindProperty]
         public bool IncludeActions { get; set; }
@@ -43,29 +45,37 @@ namespace TrelloToMicrosoftPlannerMigrator.Pages
         
         public void OnPost()
         {
+            // Include closed list?
+            // Include closed cards?
             if (Upload?.FileName != null)
             {
                 using var reader = new StreamReader(Upload.OpenReadStream());
                 var board = JsonConvert.DeserializeObject<TrelloBoard>(reader.ReadToEnd()) ?? new TrelloBoard();
                 var config = new MigrationConfiguration
                 {
-                    IncludeLists = this.IncludeLists,
-                    IncludeCards = this.IncludeCards,
+                    IncludeArchivedLists = this.IncludeArchivedLists,
+                    IncludeArchivedCards = this.IncludeArchivedCards,
                     IncludeActions = this.IncludeActions,
                     IncludeChecklists = this.IncludeChecklists,
                     IncludeLabels = this.IncludeLabels,
                     IncludePlaceholder = this.IncludePlaceholder,
                 };
+                this.TestDisplay = $"BoardURL: {board.url}\n";
                 // Do I need to pass in a microsoft token here? or can I get it in the service?
                 _migrationService.MigrateTrelloBoard(board, config);
-                this.TestDisplay = $"BoardURL: {board.url}\n";
+                //foreach(var actionType in board.actions.GroupBy(x => x.type))
+                //    this.TestDisplay += $"{actionType.Key}\n\n";
+
+                foreach (var action in board.cards.Where(x => x.attachments.Any()))
+                    this.TestDisplay += $"{JsonConvert.SerializeObject(action.attachments)}\n\n";
+                this.TestDisplay += $"\n";
             }
             else
                 this.TestDisplay = $"There was an issue parsing the file\n\n";
 
             this.TestDisplay += 
-                $"Include Lists:       {this.IncludeLists}\n" +
-                $"Include Cards:       {this.IncludeCards}\n" +
+                $"Include Lists:       {this.IncludeArchivedLists}\n" +
+                $"Include Cards:       {this.IncludeArchivedCards}\n" +
                 $"Include ACtions:     {this.IncludeActions}\n" +
                 $"Include Checklists:  {this.IncludeChecklists}\n" +
                 $"Include Labels:      {this.IncludeLabels}\n" +

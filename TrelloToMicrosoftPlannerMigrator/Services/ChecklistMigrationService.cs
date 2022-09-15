@@ -1,15 +1,16 @@
 ﻿using TrelloToMicrosoftPlannerMigrator.Models;
+using TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels;
 
 namespace TrelloToMicrosoftPlannerMigrator.Services
 {
     public interface IChecklistMigrationService
     {
-        void MigrateChecklists(TrelloBoard board);
+        void MigrateChecklists(List<Checklist> checklists);
     }
 
     public class ChecklistMigrationService : IChecklistMigrationService
     {
-        public void MigrateChecklists(TrelloBoard board)
+        public void MigrateChecklists(List<Checklist> checklists)
         {
 
         }
