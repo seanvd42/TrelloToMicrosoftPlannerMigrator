@@ -1,10 +1,12 @@
-﻿using TrelloToMicrosoftPlannerMigrator.Models;
+﻿using Microsoft.Graph;
+using System.Numerics;
+using TrelloToMicrosoftPlannerMigrator.Models;
 
 namespace TrelloToMicrosoftPlannerMigrator.Services
 {
     public interface IMigrationService
     {
-        void MigrateTrelloBoard(TrelloBoard board, bool includeArchivedLists, bool includeArchivedCards);
+        Task MigrateTrelloBoardAsync(TrelloBoard board, bool includeArchivedLists, bool includeArchivedCards);
     }
 
     public class MigrationService : IMigrationService
@@ -14,38 +16,49 @@ namespace TrelloToMicrosoftPlannerMigrator.Services
         private ICommentMigrationService _actionMigrationService;
         private IChecklistMigrationService _checklistMigrationService;
         private ILabelMigrationService _labelMigrationService;
+        private readonly GraphServiceClient _graphServiceClient;
 
         public MigrationService(
             IListMigrationService list, 
             ICardMigrationService card, 
             ICommentMigrationService action,
             IChecklistMigrationService checklist,
-            ILabelMigrationService labels)
+            ILabelMigrationService labels,
+            GraphServiceClient graphServiceClient)
         {
             _listMigrationService = list;
             _cardMigrationService = card;
             _actionMigrationService = action;
             _checklistMigrationService = checklist;
             _labelMigrationService = labels;
+            _graphServiceClient = graphServiceClient;
         }
-        public void MigrateTrelloBoard(TrelloBoard board, bool includeArchivedLists, bool includeArchivedCards)
+        public async Task MigrateTrelloBoardAsync(TrelloBoard board, bool includeArchivedLists, bool includeArchivedCards)
         {
             // Need to get some sort of token probably, maybe do that in the
             //     Index.cshtml.cs file and pass it in?
-            var planID = CreatePlan(board.name);
-            var listIDToBucketIDDict = _listMigrationService.MigrateLists(board.lists, planID, includeArchivedLists);
-            var labelIDtoCategoryDict = _labelMigrationService.MigrateLabels(board.labels, planID);
-            var cardIDToTaskIDDict = _cardMigrationService.MigrateCards(board.cards, planID, listIDToBucketIDDict, labelIDtoCategoryDict, includeArchivedCards);
+            var plan = await CreatePlanAsync(board.name);
+            var listIDToBucketIDDict = _listMigrationService.MigrateLists(board.lists, plan.ID, includeArchivedLists);
+            var labelIDtoCategoryDict = _labelMigrationService.MigrateLabels(board.labels, plan.ID);
+            var cardIDToTaskIDDict = _cardMigrationService.MigrateCards(board.cards, plan.ID, listIDToBucketIDDict, labelIDtoCategoryDict, includeArchivedCards);
             var comments = board.actions.Where(x => x.type == "commentCard").ToList();
             _actionMigrationService.MigrateComments(comments);
             _checklistMigrationService.MigrateChecklists(board.checklists);
         }
 
-        public string CreatePlan(string boardName)
+        public async Task<Plan> CreatePlanAsync(string boardName)
         {
+            return new Plan();
+            /*
             // How do i determine owner?
             // Need to check if plan exists and if it does create one with number
-            return "_newIDFor_" + boardName;
+            var response = await _microsoftGraphAPIService.PostAsync<object>("planner/plans", new
+            {
+                owner = "09d7497a-661c-43c4-97ed-8ba6834e382f",
+                title = boardName
+            });
+            return await response.Content.ReadFromJsonAsync<Plan>();
+            */
         }
     }
 }
