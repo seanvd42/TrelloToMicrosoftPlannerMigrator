@@ -18,7 +18,7 @@
     <h1 class="display-4">Migrate Trello to Microsoft Planner</h1>
     <p>Upload your Trello board json file and select what you would like to expert</p>
     
-    @using (Html.BeginForm("FormSubmit", "Home", FormMethod.Post))
+    @using (Html.BeginForm("FormSubmit", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.LabelFor(m => m.IncludeArchivedLists)
         @Html.CheckBoxFor(m => m.IncludeArchivedLists)
