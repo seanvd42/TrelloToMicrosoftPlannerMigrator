@@ -8,8 +8,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Reflection;
 using TrelloToMicrosoftPlannerMigrator.Models;
+using TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels;
 
 namespace TrelloToMicrosoftPlannerMigrator.Controllers
 {
@@ -38,10 +41,44 @@ namespace TrelloToMicrosoftPlannerMigrator.Controllers
         [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
         public async Task<IActionResult> IndexAsync()
         {
-            //var plans = await _graphServiceClient.Me.Planner.Plans.Request().GetAsync();
-            //ViewData["Plans"] = plans.Select(x => x.Title).ToList();
             return View();
         }
+
+        [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
+        [HttpPost]
+        public async Task<IActionResult> FormSubmitAsync([FromForm] UserInput model)
+        {
+            if (model.TrelloBoardFile?.FileName != null)
+            {
+                using var reader = new StreamReader(model.TrelloBoardFile.OpenReadStream());
+                var board = JsonConvert.DeserializeObject<TrelloBoard>(reader.ReadToEnd()) ?? new TrelloBoard();
+                model.TestDisplay = $"BoardURL: {board.url}\n";
+                //await _migrationService.MigrateTrelloBoardAsync(board, model.IncludeArchivedLists, IncludeArchivedCards);
+
+                var newPlan = new PlannerPlan
+                {
+                    Title = "Created From Code",
+                };
+                //var newPlanGroup = new Group();
+                //newPlanGroup.DisplayName = board.name;
+                //var group = await _graphServiceClient.Groups.Request().AddAsync(newPlanGroup);
+                var plan = await _graphServiceClient.Planner.Plans.Request().AddAsync(newPlan);
+                var plans = await _graphServiceClient.Planner.Plans.Request().GetAsync();
+                ViewData["Plans"] = plans.Select(x => x.Title).ToList();
+
+                model.TestDisplay +=
+                    $"New Plan ID:      {plan.Id}\n" +
+                    $"New Plan Title:   {plan.Title}\n";
+            }
+            else
+                model.TestDisplay = $"There was an issue parsing the file\n\n";
+            model.TestDisplay +=
+                $"Include Lists:    {model.IncludeArchivedLists}\n" +
+                $"Include Cards:    {model.IncludeArchivedCards}\n";
+            return View("Index", model);
+        }
+
+
 
         [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
         public async Task<IActionResult> Profile()
