@@ -55,13 +55,25 @@ namespace TrelloToMicrosoftPlannerMigrator.Controllers
                 model.TestDisplay = $"BoardURL: {board.url}\n";
                 //await _migrationService.MigrateTrelloBoardAsync(board, model.IncludeArchivedLists, IncludeArchivedCards);
 
+                var newPlanGroup = new Group
+                {
+                    DisplayName = board.name,
+                    MailEnabled = false,
+                    MailNickname = board.name,
+                    SecurityEnabled = true
+                };
+                var group = await _graphServiceClient.Groups.Request().AddAsync(newPlanGroup);
+                var user = await _graphServiceClient.Me.Request().GetAsync();
                 var newPlan = new PlannerPlan
                 {
-                    Title = "Created From Code",
+                    Title = board.name,
+                    Owner = user.Id,
+                    Container = new PlannerPlanContainer 
+                    { 
+                        ContainerId = group.Id,
+                        Type = PlannerContainerType.Group
+                    }
                 };
-                //var newPlanGroup = new Group();
-                //newPlanGroup.DisplayName = board.name;
-                //var group = await _graphServiceClient.Groups.Request().AddAsync(newPlanGroup);
                 var plan = await _graphServiceClient.Planner.Plans.Request().AddAsync(newPlan);
                 var plans = await _graphServiceClient.Planner.Plans.Request().GetAsync();
                 ViewData["Plans"] = plans.Select(x => x.Title).ToList();
