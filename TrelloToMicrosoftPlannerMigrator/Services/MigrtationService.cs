@@ -1,6 +1,7 @@
 ﻿using Microsoft.Graph;
 using System.Numerics;
 using TrelloToMicrosoftPlannerMigrator.Models;
+using TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels;
 
 namespace TrelloToMicrosoftPlannerMigrator.Services
 {
@@ -35,30 +36,39 @@ namespace TrelloToMicrosoftPlannerMigrator.Services
         }
         public async Task MigrateTrelloBoardAsync(TrelloBoard board, bool includeArchivedLists, bool includeArchivedCards)
         {
-            // Need to get some sort of token probably, maybe do that in the
-            //     Index.cshtml.cs file and pass it in?
             var plan = await CreatePlanAsync(board.name);
-            var listIDToBucketIDDict = _listMigrationService.MigrateLists(board.lists, plan.ID, includeArchivedLists);
-            var labelIDtoCategoryDict = _labelMigrationService.MigrateLabels(board.labels, plan.ID);
-            var cardIDToTaskIDDict = _cardMigrationService.MigrateCards(board.cards, plan.ID, listIDToBucketIDDict, labelIDtoCategoryDict, includeArchivedCards);
+            var listIDToBucketIDDict = _listMigrationService.MigrateLists(board.lists, plan.Id, includeArchivedLists);
+            var labelIDtoCategoryDict = _labelMigrationService.MigrateLabels(board.labels, plan.Id);
+            var cardIDToTaskIDDict = _cardMigrationService.MigrateCards(board.cards, plan.Id, listIDToBucketIDDict, labelIDtoCategoryDict, includeArchivedCards);
             var comments = board.actions.Where(x => x.type == "commentCard").ToList();
             _actionMigrationService.MigrateComments(comments);
             _checklistMigrationService.MigrateChecklists(board.checklists);
         }
 
-        public async Task<Plan> CreatePlanAsync(string boardName)
+        public async Task<PlannerPlan> CreatePlanAsync(string boardName)
         {
-            return new Plan();
-            /*
-            // How do i determine owner?
-            // Need to check if plan exists and if it does create one with number
-            var response = await _microsoftGraphAPIService.PostAsync<object>("planner/plans", new
+            var groups = await _graphServiceClient.Groups
+                .Request()
+                .GetAsync();
+            var group = groups.First(x => x.MailEnabled ?? false);
+
+            // If plan title in use add number to end
+            var plans = await _graphServiceClient.Groups[group.Id].Planner.Plans
+                .Request()
+                .GetAsync();
+            var appendNum = 1;
+            var newBoardName = boardName;
+            while(plans.Any(x => x.Title == newBoardName))
+                newBoardName = boardName += appendNum++;
+            boardName = newBoardName;
+
+            // Create new plan
+            var newPlan = new PlannerPlan
             {
-                owner = "09d7497a-661c-43c4-97ed-8ba6834e382f",
-                title = boardName
-            });
-            return await response.Content.ReadFromJsonAsync<Plan>();
-            */
+                Title = boardName,
+                Owner = group.Id,
+            };
+            return await _graphServiceClient.Planner.Plans.Request().AddAsync(newPlan);
         }
     }
 }

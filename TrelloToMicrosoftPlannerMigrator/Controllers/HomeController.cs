@@ -13,12 +13,14 @@ using System.Diagnostics;
 using System.Reflection;
 using TrelloToMicrosoftPlannerMigrator.Models;
 using TrelloToMicrosoftPlannerMigrator.Models.TrelloBoardSubModels;
+using TrelloToMicrosoftPlannerMigrator.Services;
 
 namespace TrelloToMicrosoftPlannerMigrator.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
+        private readonly IMigrationService _migrationService;
         private readonly ILogger<HomeController> _logger;
         private readonly GraphServiceClient _graphServiceClient;
         private readonly MicrosoftIdentityConsentAndConditionalAccessHandler _consentHandler;
@@ -27,8 +29,10 @@ namespace TrelloToMicrosoftPlannerMigrator.Controllers
         public HomeController(ILogger<HomeController> logger,
                             IConfiguration configuration,
                             GraphServiceClient graphServiceClient,
-                            MicrosoftIdentityConsentAndConditionalAccessHandler consentHandler)
+                            MicrosoftIdentityConsentAndConditionalAccessHandler consentHandler,
+                            IMigrationService migrationService)
         {
+            _migrationService = migrationService;
             _logger = logger;
             _graphServiceClient = graphServiceClient;
             this._consentHandler = consentHandler;
@@ -52,41 +56,10 @@ namespace TrelloToMicrosoftPlannerMigrator.Controllers
             {
                 using var reader = new StreamReader(model.TrelloBoardFile.OpenReadStream());
                 var board = JsonConvert.DeserializeObject<TrelloBoard>(reader.ReadToEnd()) ?? new TrelloBoard();
-                model.TestDisplay = $"BoardURL: {board.url}\n";
-                //await _migrationService.MigrateTrelloBoardAsync(board, model.IncludeArchivedLists, IncludeArchivedCards);
-
-                var newPlanGroup = new Group
-                {
-                    DisplayName = board.name,
-                    MailEnabled = false,
-                    MailNickname = board.name,
-                    SecurityEnabled = true
-                };
-                var group = await _graphServiceClient.Groups.Request().AddAsync(newPlanGroup);
-                var user = await _graphServiceClient.Me.Request().GetAsync();
-                var newPlan = new PlannerPlan
-                {
-                    Title = board.name,
-                    Owner = user.Id,
-                    Container = new PlannerPlanContainer 
-                    { 
-                        ContainerId = group.Id,
-                        Type = PlannerContainerType.Group
-                    }
-                };
-                var plan = await _graphServiceClient.Planner.Plans.Request().AddAsync(newPlan);
-                var plans = await _graphServiceClient.Planner.Plans.Request().GetAsync();
-                ViewData["Plans"] = plans.Select(x => x.Title).ToList();
-
-                model.TestDisplay +=
-                    $"New Plan ID:      {plan.Id}\n" +
-                    $"New Plan Title:   {plan.Title}\n";
+                await _migrationService.MigrateTrelloBoardAsync(board, model.IncludeArchivedLists, model.IncludeArchivedCards);
             }
             else
                 model.TestDisplay = $"There was an issue parsing the file\n\n";
-            model.TestDisplay +=
-                $"Include Lists:    {model.IncludeArchivedLists}\n" +
-                $"Include Cards:    {model.IncludeArchivedCards}\n";
             return View("Index", model);
         }
 
